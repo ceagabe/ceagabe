@@ -12,7 +12,7 @@ system("cls")
 
 import tkinter as tk
 from tkinter import ttk
-
+import sqlite3
 
 clientes = []
 deportes = []
@@ -71,6 +71,18 @@ def agregar_cliente():
         print("Cliente agregado: ") 
         imprimir(cliente)
         
+        #Base de Datos para los socios
+        conexion= sqlite3.connect("BD_clientes.db")
+        cursor= conexion.cursor()  #puntero a la base de datos
+        cursor.execute("CREATE TABLE IF NOT EXISTs clientes(id INTEGER PRIMARY KEY AUTOINCREMENT, nombre VARCHAR(50),apellido VARCHAR(50), dni INTEGER, telefono INTEGER, edad INTEGER,direccion VARCHAR(20),deporte VARCHAR(20),ingreso VARCHAR(20),certificado VARCHAR(20))")
+        cursor.execute("insert into clientes (nombre, apellido, dni, telefono, edad, direccion, deporte, ingreso, certificado ) values (?,?,?,?,?,?,?,?,?)",(nombre, apellido, dni, telefono, edad, direccion, deporte,fecha, certificado ))
+        cursor.execute("select nombre, apellido, dni,telefono, edad, direccion, ingreso,certificado from clientes" )
+
+        clientes.append(cliente)
+ 
+        conexion.commit()
+        conexion.close()
+        
 def borrar_cliente():
     dni =int(dni1.get())
     for cliente in clientes:
@@ -79,7 +91,16 @@ def borrar_cliente():
             imprimir(cliente)  
             clientes.remove(cliente)
             print("Borrar Cliente", "Cliente eliminado correctamente.")
+            conexion= sqlite3.connect("BD_clientes.db")
+            cursor= conexion.cursor()  #puntero a la base de datos  
+            cursor.execute("delete from clientes where dni= ?",(dni,))  #Borra en la Base de Datos
+            conexion.commit()
+            conexion.close()
+        
             return
+                   
+       
+        
     print("Borrar Cliente", "No se encontró un cliente con ese DNI.")
 
 def listar_clientes():
